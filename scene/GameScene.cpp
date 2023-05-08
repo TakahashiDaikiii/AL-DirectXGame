@@ -1,16 +1,33 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+#include"Player.h"
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+	delete model_;
+	delete player_;
+}
 
 void GameScene::Initialize() {
 
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
+
+	textureHandle_ = TextureManager::Load("Playerr1.png");
+	model_ = Model::Create();
+
+	worldTransform_.Initialize();
+
+	viewProjection_.Initialize();
+
+	
+	player_ = new Player();
+
+	player_->Initialize(model_, textureHandle_);
+
 }
 
 void GameScene::Update() {}
@@ -41,7 +58,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
-
+	//
+	player_->Drow(viewProjection_);
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
