@@ -8,7 +8,8 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
-#include"Player.h"
+#include "Player.h"
+#include "DebugCamera.h"
 
 
 /// <summary>
@@ -61,5 +62,10 @@ private: // メンバ変数
 
 	WorldTransform worldTransform_;
 
+	//デバッグカメラ有効
+
+	bool isDebugCameraActive_ = false;
+
+	DebugCamera* debugCamera_ =nullptr;
 };
 
