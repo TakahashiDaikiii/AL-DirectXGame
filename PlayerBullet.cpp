@@ -1,7 +1,8 @@
 ﻿#include "PlayerBullet.h"
 #include "MyMath.h"
 #include <cassert>
-void PlayerBullet::Iniialize(Model* model, const Vector3& position) {
+void PlayerBullet::Iniialize(Model* model, const Vector3& position, const Vector3& velocity)
+{
 	assert(model);
 
 	model_ = model;
@@ -16,12 +17,30 @@ void PlayerBullet::Iniialize(Model* model, const Vector3& position) {
 	worldTransform_.translation_ = position;
 	 
 	worldTransform_.Initialize();
+
+	//引数で受け取った速度をメンバ変数に代入
+	velocity_ = velocity;
 }
 
-void PlayerBullet::Update() {
+
+
+void PlayerBullet::Update() 
+{
+	//座標を移動させる
+	worldTransform_.translation_.x += velocity_.x;
+	worldTransform_.translation_.y += velocity_.y;
+	worldTransform_.translation_.z += velocity_.z;
+
+
 	worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
+
+	//時間経過でデス
+	if (--deathTimer_ <= 0)
+	{
+		isDead_ = true;
+	}
 }
 
 void PlayerBullet::Draw(const ViewProjection& viewProjection) {

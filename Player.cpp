@@ -34,6 +34,16 @@ Player::~Player()
 }
 
 void Player::Update() {
+	//デスフラグの経った球を削除
+	bullets_.remove_if([](PlayerBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
+
+
 	Vector3 move = {0, 0, 0};
 
 	const float kCharacterSpeed = 0.2f;
@@ -176,10 +186,16 @@ void Player::Update() {
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE))
 	{
+		//弾の速度
+		const float kBulletSpeed = 1.0f;
+		Vector3 velocity(0, 0, kBulletSpeed);
+
+		//速度ベクトルを自機の向きに合わせて回転させる
+		velocity = TransformNormal(velocity, worldTransform_.matWorld_);
 
 		// 弾を生成し初期化
 		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Iniialize(model_, worldTransform_.translation_);
+		newBullet->Iniialize(model_, worldTransform_.translation_,velocity);
 
 		bullets_.push_back(newBullet);
 	}
