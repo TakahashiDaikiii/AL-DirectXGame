@@ -1,12 +1,10 @@
 ﻿#pragma once
-#include"Model.h"
-#include"WorldTransform.h"
-#include<cassert>
-#include<PrimitiveDrawer.h>
-#include<Input.h>
-#include"Model.h"
-#include"WorldTransform.h"
-
+#include "Model.h"
+#include "PlayerBullet.h"
+#include "WorldTransform.h"
+#include <Input.h>
+#include <PrimitiveDrawer.h>
+#include <cassert>
 
 class Player {
 public:
@@ -18,10 +16,16 @@ public:
 	/// 更新
 	/// </summary>
 	void Update();
+
+	///
+	/// 攻撃
+	///
+	void Attack();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Drow(ViewProjection&viewProjection);
+	void Drow(ViewProjection& viewProjection);
 
 private:
 	WorldTransform worldTransform_;
@@ -31,4 +35,6 @@ private:
 	uint32_t textureHandle_ = 0u;
 
 	Input* input_ = nullptr;
+
+	PlayerBullet* bullet_ = nullptr;
 };

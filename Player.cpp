@@ -1,32 +1,25 @@
 ﻿#include "Player.h"
-#include<cassert>
-#include"WorldTransform.h"
-#include"Model.h"
-#include"MyMath.h"
-#include"ImGuiManager.h"
-void Player::Initialize(Model* model, uint32_t textureHandle) 
-{ assert(model); 
-	
-    model_ = model;
+#include "ImGuiManager.h"
+#include "MyMath.h"
+#include <cassert>
+
+void Player::Initialize(Model* model, uint32_t textureHandle) {
+	assert(model);
+
+	model_ = model;
 	textureHandle_ = textureHandle;
 
 	input_ = Input::GetInstance();
 
-
 	// X,Y,Z 方向のスケーリングを設定
-	worldTransform_.scale_ = {5.0f, 1.0f, 1.0f};
+	worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
 
-	worldTransform_.Initialize();
-	
+
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
-
-	worldTransform_.Initialize();
 
 	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 
 	worldTransform_.Initialize();
-
-
 }
 
 void Player::Update() {
@@ -46,74 +39,95 @@ void Player::Update() {
 		move.y += kCharacterSpeed;
 	}
 
-	worldTransform_.translation_.x += move.x;
-	worldTransform_.translation_.y -= move.y;
-	worldTransform_.translation_.z += move.z;
+	 worldTransform_.translation_.x += move.x;
+	 worldTransform_.translation_.y -= move.y;
+	 worldTransform_.translation_.z += move.z;
 
-	// スケーリング行列を宣言
+	//// スケーリング行列を宣言
 
-	Matrix4x4 matScale = {0};
+	 Matrix4x4 matScale = {0};
 
-	matScale.m[0][0] = worldTransform_.scale_.x;
-	matScale.m[1][1] = worldTransform_.scale_.y;
-	matScale.m[2][2] = worldTransform_.scale_.z;
-	matScale.m[3][3] = 1;
+	 matScale.m[0][0] = worldTransform_.scale_.x;
+	 matScale.m[1][1] = worldTransform_.scale_.y;
+	 matScale.m[2][2] = worldTransform_.scale_.z;
+	 matScale.m[3][3] = 1;
 
-	worldTransform_.TransferMatrix();
+	 worldTransform_.TransferMatrix();
 
-	Matrix4x4 matRotX = {0};
+	 Matrix4x4 matRotX = {0};
 
-	matRotX.m[0][0] = 1;
-	matRotX.m[1][1] = cosf(worldTransform_.rotation_.x);
-	matRotX.m[2][1] = -sinf(worldTransform_.rotation_.x);
-	matRotX.m[1][2] = sinf(worldTransform_.rotation_.x);
-	matRotX.m[2][2] = cosf(worldTransform_.rotation_.x);
-	matRotX.m[3][3] = 1;
+	 matRotX.m[0][0] = 1;
+	 matRotX.m[1][1] = cosf(worldTransform_.rotation_.x);
+	 matRotX.m[2][1] = -sinf(worldTransform_.rotation_.x);
+	 matRotX.m[1][2] = sinf(worldTransform_.rotation_.x);
+	 matRotX.m[2][2] = cosf(worldTransform_.rotation_.x);
+	 matRotX.m[3][3] = 1;
 
-	// 行列の転送
-	worldTransform_.TransferMatrix();
+	 const float kRotSpeed = 0.02f;
 
-	// Y
+	 if (input_->PushKey(DIK_A))
+	{
+		worldTransform_.rotation_.y -= kRotSpeed;
+	 }
+	 else if (input_->PushKey(DIK_D))
 
-	Matrix4x4 matRotY = {0};
-	matRotY.m[0][0] = cosf(worldTransform_.rotation_.y);
-	matRotY.m[1][1] = 1;
-	matRotY.m[0][2] = -sinf(worldTransform_.rotation_.y);
-	matRotY.m[2][0] = sinf(worldTransform_.rotation_.y);
-	matRotY.m[2][2] = cosf(worldTransform_.rotation_.y);
-	matRotY.m[3][3] = 1;
+	{
+		worldTransform_.rotation_.y += kRotSpeed;
+	}
 
-	worldTransform_.TransferMatrix();
+	//// 行列の転送
+	 worldTransform_.TransferMatrix();
 
-	// Z
-	Matrix4x4 matRotZ = {0};
-	matRotZ.m[0][0] = cosf(worldTransform_.rotation_.z);
-	matRotZ.m[1][0] = sinf(worldTransform_.rotation_.z);
-	matRotZ.m[0][1] = -sinf(worldTransform_.rotation_.z);
-	matRotZ.m[1][1] = cosf(worldTransform_.rotation_.z);
-	matRotZ.m[2][2] = 1;
-	matRotZ.m[3][3] = 1;
+	//// Y
 
-	Matrix4x4 matRot=Multiply(Multiply( matRotZ,matRotX), matRotY);
+	 Matrix4x4 matRotY = {0};
+	 matRotY.m[0][0] = cosf(worldTransform_.rotation_.y);
+	 matRotY.m[1][1] = 1;
+	 matRotY.m[0][2] = -sinf(worldTransform_.rotation_.y);
+	 matRotY.m[2][0] = sinf(worldTransform_.rotation_.y);
+	 matRotY.m[2][2] = cosf(worldTransform_.rotation_.y);
+	 matRotY.m[3][3] = 1;
 
-	worldTransform_.TransferMatrix();
+	 worldTransform_.TransferMatrix();
 
-	Matrix4x4 matTrans = {0};
+	//// Z
+	 Matrix4x4 matRotZ = {0};
+	 matRotZ.m[0][0] = cosf(worldTransform_.rotation_.z);
+	 matRotZ.m[1][0] = sinf(worldTransform_.rotation_.z);
+	 matRotZ.m[0][1] = -sinf(worldTransform_.rotation_.z);
+	 matRotZ.m[1][1] = cosf(worldTransform_.rotation_.z);
+	 matRotZ.m[2][2] = 1;
+	 matRotZ.m[3][3] = 1;
 
-	matTrans.m[0][0] = 1;
-	matTrans.m[1][1] = 1;
-	matTrans.m[2][2] = 1;
-	matTrans.m[3][3] = 1;
-	matTrans.m[3][0] = worldTransform_.translation_.x;
-	matTrans.m[3][1] = worldTransform_.translation_.y;
-	matTrans.m[3][2] = worldTransform_.translation_.z;
+	 Matrix4x4 matRot=Multiply(Multiply( matRotZ,matRotX), matRotY);
 
-	worldTransform_.matWorld_ = Multiply(Multiply(matScale, matRot) , matTrans);
+	 worldTransform_.TransferMatrix();
+
+	 Matrix4x4 matTrans = {0};
+
+	 matTrans.m[0][0] = 1;
+	 matTrans.m[1][1] = 1;
+	 matTrans.m[2][2] = 1;
+	 matTrans.m[3][3] = 1;
+	 matTrans.m[3][0] = worldTransform_.translation_.x;
+	 matTrans.m[3][1] = worldTransform_.translation_.y;
+	 matTrans.m[3][2] = worldTransform_.translation_.z;
+
+	 worldTransform_.matWorld_ = Multiply(Multiply(matScale, matRot) , matTrans);
+
+	 worldTransform_.TransferMatrix();
+	worldTransform_.matWorld_ = MakeAffineMatrix(
+	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 
 
-	worldTransform_.TransferMatrix();
+	Attack();
 
-	//キャラクターの座標を画面表示する処理
+	if (bullet_)
+	{
+		bullet_->Update();
+	}
+
+	// キャラクターの座標を画面表示する処理
 
 	ImGui::Begin("Debug");
 	float playerPos[] = {
@@ -146,10 +160,23 @@ void Player::Update() {
 	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
 }
 
+void Player::Attack() {
+	if (input_->PushKey(DIK_SPACE)) {
+		// 弾を生成し初期化
+		PlayerBullet* newBullet = new PlayerBullet();
+		newBullet->Iniialize(model_, worldTransform_.translation_);
 
-
-
-	void Player::Drow(ViewProjection & viewProjection) 
-	{
-		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+		bullet_ = newBullet;
 	}
+}
+
+void Player::Drow(ViewProjection& viewProjection) 
+{
+	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+
+	if (bullet_)
+	{
+		bullet_->Draw(viewProjection);
+	}
+}
+ 
