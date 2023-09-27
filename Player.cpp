@@ -3,7 +3,18 @@
 #include "MyMath.h"
 #include <cassert>
 
-void Player::Initialize(Model* model, uint32_t textureHandle) {
+
+
+
+Player::~Player() 
+{
+	for (PlayerBullet* bullet : bullets_)
+	{
+		delete bullet;
+	}
+}
+
+	void Player::Initialize(Model* model, uint32_t textureHandle) {
 	assert(model);
 
 	model_ = model;
@@ -122,9 +133,11 @@ void Player::Update() {
 
 	Attack();
 
-	if (bullet_)
+
+	//弾更新
+	for (PlayerBullet* bullet : bullets_)
 	{
-		bullet_->Update();
+		bullet->Update();
 	}
 
 	// キャラクターの座標を画面表示する処理
@@ -161,12 +174,14 @@ void Player::Update() {
 }
 
 void Player::Attack() {
-	if (input_->PushKey(DIK_SPACE)) {
+	if (input_->TriggerKey(DIK_SPACE))
+	{
+
 		// 弾を生成し初期化
 		PlayerBullet* newBullet = new PlayerBullet();
 		newBullet->Iniialize(model_, worldTransform_.translation_);
 
-		bullet_ = newBullet;
+		bullets_.push_back(newBullet);
 	}
 }
 
@@ -174,9 +189,12 @@ void Player::Drow(ViewProjection& viewProjection)
 {
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
 
-	if (bullet_)
+	for (PlayerBullet* bullet : bullets_)
 	{
-		bullet_->Draw(viewProjection);
+		bullet->Draw(viewProjection);
 	}
 }
- 
+
+
+
+
