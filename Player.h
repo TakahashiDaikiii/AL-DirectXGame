@@ -36,6 +36,8 @@ public:
 
 ~Player();
 
+Vector3 GetWorldPosition();
+
 
 
 private:

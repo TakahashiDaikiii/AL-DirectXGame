@@ -3,6 +3,9 @@
 #include "WorldTransform.h"
 #include"EnemyBullet.h"
 #include<list>
+
+class Player;
+
 class Enemy {
 
 public:
@@ -21,6 +24,10 @@ public:
 	void Fire();
 
 	void Approach();
+
+	void SetPlayer(Player* player) { player_ = player; }
+
+	Vector3 GetWorldPosition();
 
 	//発射間隔
 	static const int kFireInterval = 60;
@@ -52,5 +59,6 @@ private:
 	std::list<EnemyBullet*> bullets_;
 
 	int32_t timer = 0;
+	Player* player_ = nullptr;
 };
 

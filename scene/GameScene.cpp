@@ -36,8 +36,7 @@ void GameScene::Initialize() {
 
 	enemy_->Initialize(model_, {0.0f, 0.0f, 50.0f});
 
-
-
+	enemy_->SetPlayer(player_);
 
 	debugCamera_ = new DebugCamera(1280, 720);
 

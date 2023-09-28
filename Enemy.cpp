@@ -1,6 +1,7 @@
 ﻿#include "Enemy.h"
 #include "MyMath.h"
 #include <cassert>
+#include"Player.h"
 
 
 
@@ -8,6 +9,17 @@ Enemy::~Enemy() {
 	for (EnemyBullet* bullet : bullets_) {
 		delete bullet;
 	}
+}
+
+
+Vector3 Enemy::GetWorldPosition() {
+	Vector3 worldPos;
+
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
 }
 
 void Enemy::Initialize(Model* model, const Vector3& position) {
@@ -61,7 +73,7 @@ void Enemy::Update()
 			phase_ = Phase::Leave;
 		}
 		timer++;
-		if (timer == 150)
+		if (timer == 100)
 		{
 			Fire();
 
@@ -99,11 +111,24 @@ void Enemy::Draw(const ViewProjection& viewProjection)
 }
 
 void Enemy::Fire() {
-	// 弾の速度
-	const float kBulletSpeed = 0.5f;
-	Vector3 velocity(0, 0, -kBulletSpeed);
 
-	// 速度ベクトルを自機の向きに合わせて回転させる
+	assert(player_);
+	// 弾の速度
+	const float kBulletSpeed = 1.0f;
+
+	Vector3 enemy = Enemy::GetWorldPosition();
+
+	Vector3 player = player_->GetWorldPosition();
+
+	Vector3 velocity = Subtract(player,enemy );
+
+	velocity = Normalise(velocity);
+
+	velocity.x *= kBulletSpeed;
+	velocity.y *= kBulletSpeed;
+	velocity.z *= kBulletSpeed;
+
+	// 速度ベクトルを自機のN向きに合わせて回転させる
 	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
 
 	// 弾を生成し初期化
@@ -119,4 +144,3 @@ void Enemy::Approach()
 
 
 }
-

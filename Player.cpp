@@ -9,6 +9,18 @@ Player::~Player() {
 	}
 }
 
+Vector3 Player::GetWorldPosition() 
+{ 
+	Vector3 worldPos;
+
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos;
+
+}
+
 void Player::Initialize(Model* model, uint32_t textureHandle) {
 	assert(model);
 
@@ -26,6 +38,8 @@ void Player::Initialize(Model* model, uint32_t textureHandle) {
 	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 
 	worldTransform_.Initialize();
+
+	
 }
 
 void Player::Update() {
@@ -136,7 +150,8 @@ void Player::Update() {
 	Attack();
 
 	// 弾更新
-	for (PlayerBullet* bullet : bullets_) {
+	for (PlayerBullet* bullet : bullets_) 
+	{
 		bullet->Update();
 	}
 
@@ -171,7 +186,13 @@ void Player::Update() {
 	worldTransform_.translation_.y = max(worldTransform_.translation_.y, -kMoveLimitY);
 
 	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
+
+	
 }
+
+
+
+
 
 void Player::Attack() {
 	if (input_->TriggerKey(DIK_SPACE)) {
