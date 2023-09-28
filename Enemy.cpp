@@ -2,6 +2,14 @@
 #include "MyMath.h"
 #include <cassert>
 
+
+
+Enemy::~Enemy() {
+	for (EnemyBullet* bullet : bullets_) {
+		delete bullet;
+	}
+}
+
 void Enemy::Initialize(Model* model, const Vector3& position) {
 
 	assert(model);
@@ -20,16 +28,19 @@ void Enemy::Initialize(Model* model, const Vector3& position) {
 	worldTransform_.Initialize();
 
 	// 引数で受け取った速度をメンバ変数に代入
-	velocity_ = {0.0f,0.0f,0.3f};
+	velocity_ = {0.0f,0.0f,0.1f};
 
+	Approach();
 }
 
 void Enemy::Update() 
 {
+	worldTransform_.translation_.x = 3;
 	// 座標を移動させる
 	worldTransform_.translation_.x -= velocity_.x;
 	worldTransform_.translation_.y -= velocity_.y;
 	worldTransform_.translation_.z -= velocity_.z;
+
 
 	/*worldTransform_.matWorld_ = MakeAffineMatrix(
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
@@ -49,6 +60,13 @@ void Enemy::Update()
 		{
 			phase_ = Phase::Leave;
 		}
+		timer++;
+		if (timer == 150)
+		{
+			Fire();
+
+			timer = kFireInterval;
+		}
 
 		break;
 	case Enemy::Phase::Leave:
@@ -59,10 +77,46 @@ void Enemy::Update()
 		break;
 	}
 
+	for (EnemyBullet* bullet : bullets_) {
+		bullet->Update();
+	}
 
 }
+
+
+
 
 void Enemy::Draw(const ViewProjection& viewProjection) 
 {
+
+	for (EnemyBullet* bullet : bullets_) {
+		bullet->Draw(viewProjection);
+	}
+
 	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+
+		
 }
+
+void Enemy::Fire() {
+	// 弾の速度
+	const float kBulletSpeed = 0.5f;
+	Vector3 velocity(0, 0, -kBulletSpeed);
+
+	// 速度ベクトルを自機の向きに合わせて回転させる
+	velocity = TransformNormal(velocity, worldTransform_.matWorld_);
+
+	// 弾を生成し初期化
+	EnemyBullet* newBullet = new EnemyBullet();
+	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+
+	bullets_.push_back(newBullet);
+
+}
+
+void Enemy::Approach() 
+{ timer = kFireInterval;
+
+
+}
+

@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "Model.h"
 #include "WorldTransform.h"
-
+#include"EnemyBullet.h"
+#include<list>
 class Enemy {
 
 public:
@@ -17,11 +18,23 @@ public:
 
 	void Draw(const ViewProjection& viewProjection);
 
+	void Fire();
+
+	void Approach();
+
+	//発射間隔
+	static const int kFireInterval = 60;
+
+	
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
+
+	~Enemy();
 
 private:
-	enum class Phase 
-	{
-		Initial,//初期
+	enum class Phase {
+		Initial,  // 初期
 		Approach, // 接近する
 		Leave,    // 離脱する
 	};
@@ -36,6 +49,8 @@ private:
 
 	Vector3 velocity_;
 
-	
+	std::list<EnemyBullet*> bullets_;
+
+	int32_t timer = 0;
 };
 
