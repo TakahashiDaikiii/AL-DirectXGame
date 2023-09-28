@@ -1,7 +1,6 @@
 #include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
-#include"Player.h"
 #include"AxisIndicator.h"
 
 
@@ -11,6 +10,7 @@ GameScene::~GameScene() {
 	delete model_;
 	delete player_;
 	delete debugCamera_;
+	delete enemy_;
 }
 
 void GameScene::Initialize() {
@@ -31,6 +31,14 @@ void GameScene::Initialize() {
 
 	player_->Initialize(model_, textureHandle_);
 
+
+	enemy_ = new Enemy();
+
+	enemy_->Initialize(model_, {0.0f, 0.0f, 50.0f});
+
+
+
+
 	debugCamera_ = new DebugCamera(1280, 720);
 
 	AxisIndicator::GetInstance()->SetVisible(true);
@@ -43,6 +51,8 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 	player_->Update();
+
+	enemy_->Update();
 
 	debugCamera_->Update();
 
@@ -97,6 +107,8 @@ void GameScene::Draw() {
 	/// </summary>
 	//
 	player_->Drow(viewProjection_);
+
+	enemy_->Draw(viewProjection_);
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion

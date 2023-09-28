@@ -1,7 +1,7 @@
 ﻿#include "PlayerBullet.h"
 #include "MyMath.h"
 #include <cassert>
-void PlayerBullet::Iniialize(Model* model, const Vector3& position, const Vector3& velocity)
+void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vector3& velocity)
 {
 	assert(model);
 
@@ -32,10 +32,10 @@ void PlayerBullet::Update()
 	worldTransform_.translation_.z += velocity_.z;
 
 
-	worldTransform_.matWorld_ = MakeAffineMatrix(
-	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
-	worldTransform_.TransferMatrix();
-
+	//worldTransform_.matWorld_ = MakeAffineMatrix(
+	//    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	//worldTransform_.TransferMatrix();
+	worldTransform_.UpdateMatrix();
 	//時間経過でデス
 	if (--deathTimer_ <= 0)
 	{

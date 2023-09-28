@@ -14,7 +14,7 @@ public:
 	/// <parm name="model">モデル</param>
 	/// <parm name="position">初期座標</param>
 	
-	void Iniialize(Model* model, const Vector3& position, const Vector3& velocity);
+	void Initialize(Model* model, const Vector3& position, const Vector3& velocity);
 
 
 	///<summary>

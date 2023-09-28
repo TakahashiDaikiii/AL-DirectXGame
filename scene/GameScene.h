@@ -10,6 +10,8 @@
 #include "WorldTransform.h"
 #include "Player.h"
 #include "DebugCamera.h"
+#include"Enemy.h"
+#include"MyMath.h"
 
 
 /// <summary>
@@ -56,11 +58,16 @@ private: // メンバ変数
 
 	Player* player_ = nullptr;
 
+	Enemy* enemy_ = nullptr;
+
 	Model* model_;
 
 	ViewProjection viewProjection_;
 
 	WorldTransform worldTransform_;
+
+	Vector3 velocity_;
+
 
 	//デバッグカメラ有効
 
