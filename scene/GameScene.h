@@ -10,6 +10,7 @@
 #include "WorldTransform.h"
 #include "Player.h"
 #include "DebugCamera.h"
+#include<memory>
 
 
 /// <summary>
@@ -54,9 +55,11 @@ private: // メンバ変数
 
 	uint32_t textureHandle_ = 0;
 
-	Player* player_ = nullptr;
+	std::unique_ptr<Player> player_;
 
-	Model* model_;
+	//Player* player_ = nullptr;
+
+	std::unique_ptr<Model> model_;
 
 	ViewProjection viewProjection_;
 

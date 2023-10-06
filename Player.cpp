@@ -5,7 +5,8 @@
 #include"MyMath.h"
 #include"ImGuiManager.h"
 void Player::Initialize(Model* model, uint32_t textureHandle) 
-{ assert(model); 
+{
+	assert(model); 
 	
     model_ = model;
 	textureHandle_ = textureHandle;

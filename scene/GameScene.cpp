@@ -7,11 +7,7 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {
-	delete model_;
-	delete player_;
-	delete debugCamera_;
-}
+GameScene::~GameScene() {}
 
 void GameScene::Initialize() {
 
@@ -20,16 +16,19 @@ void GameScene::Initialize() {
 	audio_ = Audio::GetInstance();
 
 	textureHandle_ = TextureManager::Load("Playerr1.png");
-	model_ = Model::Create();
 
 	worldTransform_.Initialize();
 
 	viewProjection_.Initialize();
 
 	
-	player_ = new Player();
+	player_ = std::make_unique<Player>();
 
-	player_->Initialize(model_, textureHandle_);
+	model_.reset(Model::Create());
+
+	player_->Initialize(model_.get(), textureHandle_);
+
+	
 
 	debugCamera_ = new DebugCamera(1280, 720);
 
