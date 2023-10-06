@@ -7,7 +7,7 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() { delete skydome_; }
 
 void GameScene::Initialize() {
 
