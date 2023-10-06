@@ -17,6 +17,7 @@ void GameScene::Initialize() {
 
 	textureHandle_ = TextureManager::Load("Playerr1.png");
 
+
 	worldTransform_.Initialize();
 
 	viewProjection_.Initialize();
