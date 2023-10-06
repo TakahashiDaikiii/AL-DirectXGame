@@ -21,6 +21,7 @@ void GameScene::Initialize() {
 
 	viewProjection_.Initialize();
 
+
 	
 	player_ = std::make_unique<Player>();
 
