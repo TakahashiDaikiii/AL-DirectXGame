@@ -12,6 +12,10 @@
 #include "DebugCamera.h"
 #include"Enemy.h"
 #include"MyMath.h"
+#include"EnemyBullet.h"
+#include"PlayerBullet.h"
+#include"Skydome.h"
+#include"RailCamera.h"
 
 
 /// <summary>
@@ -45,6 +49,12 @@ public: // メンバ関数
 	/// </summary>
 	void Draw();
 
+/// <summary>
+/// 衝突判定と応答
+/// </summary>
+
+	void CheckALLCollisions();
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -60,6 +70,12 @@ private: // メンバ変数
 
 	Enemy* enemy_ = nullptr;
 
+	Skydome* skydome_ = nullptr;
+
+	Model* modelSkydome_ = nullptr;
+
+
+
 	Model* model_;
 
 	ViewProjection viewProjection_;
@@ -67,6 +83,10 @@ private: // メンバ変数
 	WorldTransform worldTransform_;
 
 	Vector3 velocity_;
+
+	EnemyBullet enemybullet_;
+
+	RailCamera railCamera_;
 
 
 	//デバッグカメラ有効

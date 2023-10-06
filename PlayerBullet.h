@@ -31,9 +31,17 @@ public:
   
 	void Draw(const ViewProjection& viewProjection);
 
+	void OnCollision();
+
 	bool IsDead() const { return isDead_; }
 
+	float GetRadius() { return r; }
+
+	Vector3 GetWorldPosition();
+
 	private:
+
+		float r = 1.0f;
 
 		WorldTransform worldTransform_;
 

@@ -11,6 +11,8 @@ Enemy::~Enemy() {
 	}
 }
 
+void Enemy::OnCollision() {}
+
 
 Vector3 Enemy::GetWorldPosition() {
 	Vector3 worldPos;
@@ -42,6 +44,8 @@ void Enemy::Initialize(Model* model, const Vector3& position) {
 	// 引数で受け取った速度をメンバ変数に代入
 	velocity_ = {0.0f,0.0f,0.1f};
 
+	
+
 	Approach();
 }
 
@@ -58,6 +62,15 @@ void Enemy::Update()
 	    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();*/
 	worldTransform_.UpdateMatrix();
+
+	bullets_.remove_if([](EnemyBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
+
 
 	switch (phase_) {
 

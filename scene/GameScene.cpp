@@ -1,8 +1,7 @@
 #include "GameScene.h"
+#include "AxisIndicator.h"
 #include "TextureManager.h"
 #include <cassert>
-#include"AxisIndicator.h"
-
 
 GameScene::GameScene() {}
 
@@ -11,6 +10,7 @@ GameScene::~GameScene() {
 	delete player_;
 	delete debugCamera_;
 	delete enemy_;
+	delete skydome_;
 }
 
 void GameScene::Initialize() {
@@ -26,11 +26,11 @@ void GameScene::Initialize() {
 
 	viewProjection_.Initialize();
 
-	
+	railCamera_.Initialize();
+
 	player_ = new Player();
 
 	player_->Initialize(model_, textureHandle_);
-
 
 	enemy_ = new Enemy();
 
@@ -44,9 +44,12 @@ void GameScene::Initialize() {
 
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+
+	skydome_ = new Skydome();
+
+	skydome_->Initialize(modelSkydome_);
 }
-
-
 
 void GameScene::Update() {
 	player_->Update();
@@ -54,6 +57,12 @@ void GameScene::Update() {
 	enemy_->Update();
 
 	debugCamera_->Update();
+
+	skydome_->Update();
+
+	railCamera_.Update();
+
+	CheckALLCollisions();
 
 #ifdef _DEBUG
 
@@ -72,8 +81,7 @@ void GameScene::Update() {
 		viewProjection_.TransferMatrix();
 	}
 
-	else 
-	{
+	else {
 		viewProjection_.UpdateMatrix();
 	}
 }
@@ -108,6 +116,8 @@ void GameScene::Draw() {
 	player_->Drow(viewProjection_);
 
 	enemy_->Draw(viewProjection_);
+
+	skydome_->Draw(viewProjection_);
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
@@ -124,4 +134,74 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+void GameScene::CheckALLCollisions() {
+
+	// 判定対象AとBの座標
+	Vector3 posA, posB;
+	// 自弾リストの取得
+	const std::list<PlayerBullet*>& playerBullets = player_->GetBullets();
+
+	// 敵弾リストの取得
+	const std::list<EnemyBullet*>& enemyBullets = enemy_->GetBullets();
+
+#pragma region
+	// 自キャラの座標
+	Vector3 player = player_->GetWorldPosition();
+
+	posA = player_->GetWorldPosition();
+
+	// 自キャラと敵弾全ての当たり判定
+	for (EnemyBullet* bullet : enemyBullets) {
+		posB = bullet->GetWorldPosition();
+
+		Vector3 d = Subtract(posA, posB);
+		// d x y z を二乗してタス
+		float dist = d.x * d.x + d.y * d.y + d.z * d.z;
+
+		float r1 = player_->GetRadius(); // プレイヤーの半径
+
+		float r2 = bullet->GetRadius(); // 敵弾の半径
+
+		float radius = r1 * r1 + r2 * r2;
+		if (dist <= radius) {
+			player_->OnCollision();
+
+			bullet->OnCollision();
+		}
+	}
+
+	// 自弾と敵キャラの当たり判定
+
+	// 敵キャラの座標
+	Vector3 Enemy = enemy_->GetWorldPosition();
+
+	posA = enemy_->GetWorldPosition();
+	// 敵キャラと自弾の当たり判定
+
+	for (PlayerBullet* bullet : playerBullets) {
+	
+	    posB = bullet->GetWorldPosition();
+
+		Vector3 d = Subtract(posA, posB);
+
+		float dist = d.x * d.x + d.y * d.y + d.z * d.z;
+
+		float r1 = enemy_->GetRadius();
+
+		float r2 = bullet->GetRadius();
+
+		float radius = r1 * r1 + r2 * r2;
+		if (dist <= radius) {
+			enemy_->OnCollision();
+
+			bullet->OnCollision();
+		}
+
+	
+	}
+
+
+
 }

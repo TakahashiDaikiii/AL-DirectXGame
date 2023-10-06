@@ -5,7 +5,7 @@
 #include <Input.h>
 #include <PrimitiveDrawer.h>
 #include <cassert>
-#include<list>
+#include <list>
 
 class Player {
 public:
@@ -23,24 +23,28 @@ public:
 	///
 	void Attack();
 
-	
-
 	/// <summary>
 	/// 描画
 	/// </summary>
 	void Drow(ViewProjection& viewProjection);
 
-/// <summary>
-/// デストラクタ
-/// </summary>
+	/// <summary>
+	/// デストラクタ
+	/// </summary>
 
-~Player();
+	~Player();
 
-Vector3 GetWorldPosition();
+	Vector3 GetWorldPosition();
 
+	void OnCollision();
 
+	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
+
+	float GetRadius() { return r; }
 
 private:
+	float r = 1.0f;
+
 	WorldTransform worldTransform_;
 
 	Model* model_ = nullptr;

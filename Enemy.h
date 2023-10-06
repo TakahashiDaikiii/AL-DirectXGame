@@ -39,6 +39,12 @@ public:
 
 	~Enemy();
 
+	void OnCollision();
+
+	const std::list<EnemyBullet*>& GetBullets() const { return bullets_; }
+
+	float GetRadius() { return r; }
+
 private:
 	enum class Phase {
 		Initial,  // 初期
@@ -60,5 +66,8 @@ private:
 
 	int32_t timer = 0;
 	Player* player_ = nullptr;
+
+	float r = 1.0f;
+			
 };
 
