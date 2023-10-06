@@ -37,6 +37,12 @@ void GameScene::Initialize() {
 
 	AxisIndicator::GetInstance()->SetTargetViewProjection(&viewProjection_);
 
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+
+	skydome_ = new Skydome();
+
+	skydome_->Initialize(modelSkydome_);
+
 }
 
 
@@ -45,6 +51,9 @@ void GameScene::Update() {
 	player_->Update();
 
 	debugCamera_->Update();
+
+	skydome_->Update();
+
 
 #ifdef _DEBUG
 
@@ -97,6 +106,8 @@ void GameScene::Draw() {
 	/// </summary>
 	//
 	player_->Drow(viewProjection_);
+
+	skydome_->Draw(viewProjection_);
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion

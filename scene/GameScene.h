@@ -10,6 +10,7 @@
 #include "WorldTransform.h"
 #include "Player.h"
 #include "DebugCamera.h"
+#include "Skydome.h"
 #include<memory>
 
 
@@ -64,6 +65,10 @@ private: // メンバ変数
 	ViewProjection viewProjection_;
 
 	WorldTransform worldTransform_;
+
+	Skydome* skydome_ = nullptr;
+
+	Model* modelSkydome_ = nullptr;
 
 	//デバッグカメラ有効
 
