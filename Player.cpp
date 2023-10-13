@@ -4,18 +4,18 @@
 #include"Model.h"
 #include"MyMath.h"
 #include"ImGuiManager.h"
-void Player::Initialize(Model* model, uint32_t textureHandle) 
+void Player::Initialize(Model* model) 
 {
 	assert(model); 
 	
     model_ = model;
-	textureHandle_ = textureHandle;
+	
 
 	input_ = Input::GetInstance();
 
 
 	// X,Y,Z 方向のスケーリングを設定
-	worldTransform_.scale_ = {5.0f, 1.0f, 1.0f};
+	worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
 
 	worldTransform_.Initialize();
 	
@@ -152,5 +152,5 @@ void Player::Update() {
 
 	void Player::Drow(ViewProjection & viewProjection) 
 	{
-		model_->Draw(worldTransform_, viewProjection, textureHandle_);
+		model_->Draw(worldTransform_, viewProjection);
 	}

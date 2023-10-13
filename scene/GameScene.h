@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "DebugCamera.h"
 #include "Skydome.h"
+#include"Ground.h"
 #include<memory>
 
 
@@ -66,9 +67,13 @@ private: // メンバ変数
 
 	WorldTransform worldTransform_;
 
-	Skydome* skydome_ = nullptr;
+	std::unique_ptr<Skydome> skydome_;
+
+	std::unique_ptr<Ground> ground_;
 
 	Model* modelSkydome_ = nullptr;
+
+	Model* modelground_ = nullptr;
 
 	//デバッグカメラ有効
 

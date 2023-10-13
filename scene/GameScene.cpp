@@ -7,7 +7,7 @@
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() { delete skydome_; }
+GameScene::~GameScene() {}
 
 void GameScene::Initialize() {
 
@@ -26,9 +26,9 @@ void GameScene::Initialize() {
 	
 	player_ = std::make_unique<Player>();
 
-	model_.reset(Model::Create());
+	model_.reset(Model::CreateFromOBJ("Player",true));
 
-	player_->Initialize(model_.get(), textureHandle_);
+	player_->Initialize(model_.get());
 
 	
 
@@ -40,9 +40,15 @@ void GameScene::Initialize() {
 
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
-	skydome_ = new Skydome();
+	skydome_ = std::make_unique<Skydome>();
 
 	skydome_->Initialize(modelSkydome_);
+
+	modelground_ = Model::CreateFromOBJ("ground", true);
+
+	ground_ = std::make_unique<Ground>();
+
+	ground_->Initialize(modelground_);
 
 }
 
@@ -109,6 +115,8 @@ void GameScene::Draw() {
 	player_->Drow(viewProjection_);
 
 	skydome_->Draw(viewProjection_);
+
+	ground_->Draw(viewProjection_);
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
 #pragma endregion
