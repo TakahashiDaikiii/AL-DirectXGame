@@ -12,6 +12,7 @@
 #include "DebugCamera.h"
 #include "Skydome.h"
 #include"Ground.h"
+#include"FollowCamera.h"
 #include<memory>
 
 
@@ -74,6 +75,8 @@ private: // メンバ変数
 	Model* modelSkydome_ = nullptr;
 
 	Model* modelground_ = nullptr;
+
+	std::unique_ptr<FollowCamera> followcamera_; 
 
 	//デバッグカメラ有効
 

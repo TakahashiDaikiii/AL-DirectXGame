@@ -109,12 +109,17 @@ float Dot(const Vector3& v1, const Vector3& v2) { return v1.x * v2.x + v1.y * v2
 
 float Length(const Vector3& v) { return sqrtf(Dot(v, v)); }
 
-Vector3 Normalise(const Vector3& v) {
+Vector3 Normalise(const Vector3& v) 
+{
 	float len = Length(v);
-	if (len != 0) {
-		return {v.x / len, v.y / len, v.z / len};
+    Vector3 result = v; 
+	if (len != 0) 
+	{
+		result.x /= len;
+		result.y /= len;
+		result.z /= len;
 	}
-	return v;
+	return result;
 }
 
 Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
