@@ -45,15 +45,8 @@ void Player::Initialize(Model* model, uint32_t textureHandle) {
 }
 
 void Player::Update() {
-	// デスフラグの経った球を削除
-	bullets_.remove_if([](PlayerBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
-
+	
+	
 	Vector3 move = {0, 0, 0};
 
 	const float kCharacterSpeed = 0.2f;
@@ -150,7 +143,14 @@ void Player::Update() {
 
 	worldTransform_.UpdateMatrix();
 	Attack();
-
+	// デスフラグの経った球を削除
+	bullets_.remove_if([](PlayerBullet* bullet) {
+		if (bullet->IsDead()) {
+			delete bullet;
+			return true;
+		}
+		return false;
+	});
 	// 弾更新
 	for (PlayerBullet* bullet : bullets_) 
 	{
@@ -166,7 +166,7 @@ void Player::Update() {
 	    worldTransform_.translation_.z,
 
 	};
-
+	ImGui::InputFloat("PlayerPos", playerPos, 0, 1);
 	ImGui::SliderFloat3("PlayerPos", playerPos, 0, 1);
 
 	worldTransform_.translation_.x = playerPos[0];

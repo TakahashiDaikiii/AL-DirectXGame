@@ -1,6 +1,7 @@
 ﻿#include "PlayerBullet.h"
 #include "MyMath.h"
 #include <cassert>
+#include <imgui.h>
 void PlayerBullet::Initialize(Model* model, const Vector3& position, const Vector3& velocity)
 {
 	assert(model);
@@ -48,7 +49,9 @@ void PlayerBullet::Draw(const ViewProjection& viewProjection) {
 }
 
 void PlayerBullet::OnCollision() 
-{ isDead_ = true;}
+{
+	isDead_ = true;
+}
 
 
 Vector3 PlayerBullet::GetWorldPosition() 

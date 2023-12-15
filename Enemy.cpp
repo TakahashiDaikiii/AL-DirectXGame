@@ -11,7 +11,9 @@ Enemy::~Enemy() {
 	}
 }
 
-void Enemy::OnCollision() {}
+void Enemy::OnCollision() {
+	
+}
 
 
 Vector3 Enemy::GetWorldPosition() {

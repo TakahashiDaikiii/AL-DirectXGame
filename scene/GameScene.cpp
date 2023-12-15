@@ -179,10 +179,9 @@ void GameScene::CheckALLCollisions() {
 
 	posA = enemy_->GetWorldPosition();
 	// 敵キャラと自弾の当たり判定
-
 	for (PlayerBullet* bullet : playerBullets) {
-	
-	    posB = bullet->GetWorldPosition();
+
+		posB = bullet->GetWorldPosition();
 
 		Vector3 d = Subtract(posA, posB);
 
@@ -198,10 +197,29 @@ void GameScene::CheckALLCollisions() {
 
 			bullet->OnCollision();
 		}
-
-	
 	}
 
+	for (EnemyBullet* enemyBullet : enemyBullets) {
 
+		posA = enemyBullet->GetWorldPosition();
 
+		for (PlayerBullet* playerBullet : playerBullets) {
+			posB = playerBullet->GetWorldPosition();
+
+			Vector3 d = Subtract(posA, posB);
+
+			float dist = d.x * d.x + d.y * d.y + d.z * d.z;
+
+			float r1 = enemyBullet->GetRadius();
+
+			float r2 = playerBullet->GetRadius();
+
+			float radius = r1 * r1 + r2 * r2;
+			if (dist <= radius) {
+				enemyBullet->OnCollision();
+
+				playerBullet->OnCollision();
+			}
+		}
+	}
 }
