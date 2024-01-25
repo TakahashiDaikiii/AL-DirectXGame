@@ -23,7 +23,14 @@ Vector3 Player::GetWorldPosition()
 
 void Player::OnCollision() {}
 
-void Player::Initialize(Model* model, uint32_t textureHandle) {
+void Player::SetParent(const WorldTransform* parent)
+{
+
+	worldTransform_.parent_ = parent;
+
+}
+
+void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 position) {
 	assert(model);
 
 	model_ = model;
@@ -32,12 +39,15 @@ void Player::Initialize(Model* model, uint32_t textureHandle) {
 
 	input_ = Input::GetInstance();
 
+	// X,Y,Z方向の平行移動を設定
+	worldTransform_.translation_ = position;
+
 	// X,Y,Z 方向のスケーリングを設定
 	worldTransform_.scale_ = {1.0f, 1.0f, 1.0f};
 
 	worldTransform_.rotation_ = {0.0f, 0.0f, 0.0f};
 
-	worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
+	//worldTransform_.translation_ = {0.0f, 0.0f, 0.0f};
 
 	worldTransform_.Initialize();
 
@@ -49,7 +59,7 @@ void Player::Update() {
 	
 	Vector3 move = {0, 0, 0};
 
-	const float kCharacterSpeed = 0.2f;
+	const float kCharacterSpeed = 0.1f;
 
 	if (input_->PushKey(DIK_LEFT)) {
 		move.x -= kCharacterSpeed;
@@ -159,6 +169,10 @@ void Player::Update() {
 
 	// キャラクターの座標を画面表示する処理
 
+
+	
+
+
 	ImGui::Begin("Debug");
 	float playerPos[] = {
 	    worldTransform_.translation_.x,
@@ -207,7 +221,7 @@ void Player::Attack() {
 
 		// 弾を生成し初期化
 		PlayerBullet* newBullet = new PlayerBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+		newBullet->Initialize(model_, GetWorldPosition(), velocity);
 
 		bullets_.push_back(newBullet);
 	}

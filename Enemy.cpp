@@ -129,7 +129,7 @@ void Enemy::Fire() {
 
 	assert(player_);
 	// 弾の速度
-	const float kBulletSpeed = 1.0f;
+	const float kBulletSpeed = 2.0f;
 
 	Vector3 enemy = Enemy::GetWorldPosition();
 
@@ -156,6 +156,5 @@ void Enemy::Fire() {
 
 void Enemy::Approach() 
 { timer = kFireInterval;
-
 
 }

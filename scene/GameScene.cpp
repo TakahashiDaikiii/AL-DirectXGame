@@ -2,6 +2,7 @@
 #include "AxisIndicator.h"
 #include "TextureManager.h"
 #include <cassert>
+#include<fstream>
 
 GameScene::GameScene() {}
 
@@ -24,19 +25,32 @@ void GameScene::Initialize() {
 
 	worldTransform_.Initialize();
 
+	railCamera_ = new RailCamera();
+
+	railCamera_->Initialize({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f});
+
+	
+
+	// ビュープロジェクション
+	viewProjection_.farZ = 600;
+
 	viewProjection_.Initialize();
 
-	railCamera_.Initialize();
-
+	Vector3 playerPosition(0, 0, 50);
+	
 	player_ = new Player();
+	player_->Initialize(model_, textureHandle_,playerPosition);
 
-	player_->Initialize(model_, textureHandle_);
+	// 自キャラとレールカメラの親子関係を結ぶ
+	player_->SetParent(&railCamera_->GetWorldTransform());
 
 	enemy_ = new Enemy();
 
 	enemy_->Initialize(model_, {0.0f, 0.0f, 50.0f});
 
 	enemy_->SetPlayer(player_);
+
+	enemy_->SetGameScene(this);
 
 	debugCamera_ = new DebugCamera(1280, 720);
 
@@ -49,6 +63,8 @@ void GameScene::Initialize() {
 	skydome_ = new Skydome();
 
 	skydome_->Initialize(modelSkydome_);
+
+
 }
 
 void GameScene::Update() {
@@ -60,7 +76,7 @@ void GameScene::Update() {
 
 	skydome_->Update();
 
-	railCamera_.Update();
+	railCamera_->Update();
 
 	CheckALLCollisions();
 
@@ -79,12 +95,28 @@ void GameScene::Update() {
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 
 		viewProjection_.TransferMatrix();
-	}
+	}else {
+		viewProjection_.matView = railCamera_->GetViewProjection().matView;
+		viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
 
-	else {
-		viewProjection_.UpdateMatrix();
+		viewProjection_.TransferMatrix();
+
+		//viewProjection_.UpdateMatrix();
 	}
 }
+
+void GameScene::SpawnEnemy(const Vector3& position) {
+	if (enemy_ != nullptr) {
+
+		delete enemy_;
+	}
+
+	enemy_ = new Enemy();
+	enemy_->Initialize(model_, position);
+	enemy_->SetPlayer(player_);
+	enemy_->SetGameScene(this);
+}
+
 
 void GameScene::Draw() {
 
@@ -220,6 +252,112 @@ void GameScene::CheckALLCollisions() {
 
 				playerBullet->OnCollision();
 			}
+		}
+	}
+}
+
+void GameScene::UpdateEnemyBullets() {
+	// 敵弾リストの更新処理
+	for (auto bullet : enemybullets_) {
+		bullet->Update();
+	}
+}
+
+void GameScene::DrawEnemyBullets() {
+	// 敵弾リストの描画処理
+	for (auto bullet : enemybullets_) {
+		bullet->Draw(viewProjection_);
+	}
+}
+
+void GameScene::ReleaseEnemyBullets() {
+	// 敵弾リストの解放処理
+	for (auto bullet : enemybullets_) {
+		delete bullet;
+	}
+	enemybullets_.clear(); // リストをクリア
+}
+
+void GameScene::SetGameSceneForEnemy(Enemy* enemy) {
+	// 敵にゲームシーンのアドレスをセットする
+	enemy->SetGameScene(this);
+}
+
+void GameScene::AddEnemyBullet(EnemyBullet* enemyBullet) {
+	// 敵弾をリストに登録する
+	enemybullets_.push_back(enemyBullet);
+}
+
+void GameScene::CheckAllCollisions() {}
+
+void GameScene::LoadEnemyPopData() 
+{ std::ifstream file;
+	file.open("enemyPop.csv");
+	assert(file.is_open());
+
+	enemyPopCommands << file.rdbuf();
+
+	file.close();
+}
+
+
+//void GameScene::CheckAllCollisions() {
+//	// 当たり判定の処理（例えば、敵と全ての自弾の当たり判定）
+//	for (Enemy* enemy : enemys_) {
+//		for (EnemyBullet* bullet : enemybullets_) {
+//			// 当たり判定処理
+//			// ...
+//		}
+//	}
+// }
+
+void GameScene::UpdateEnemyPopCommands() {
+
+	if (isWaiting_) {
+		waitingTimer_--;
+	}
+	if (waitingTimer_ <= 0) {
+		isWaiting_ = false;
+	}
+
+	std::string line;
+
+	while (std::getline(enemyPopCommands, line))
+
+	{
+		std::istringstream line_stream(line);
+
+		std::string word;
+
+		std::getline(line_stream, word, ',');
+
+		if (word.find("//") == 0) {
+			continue;
+		}
+
+		if (word.find("POP") == 0) {
+
+			std::getline(line_stream, word, ',');
+			float x = (float)std::atof(word.c_str());
+
+			std::getline(line_stream, word, ',');
+			float y = (float)std::atof(word.c_str());
+
+			std::getline(line_stream, word, ',');
+			float z = (float)std::atof(word.c_str());
+
+			SpawnEnemy(Vector3(x, y, z));
+		}
+
+		else if (word.find("WITE") == 0) {
+			std::getline(line_stream, word, ',');
+
+			int32_t waitTime = atoi(word.c_str());
+
+			isWaiting_ = true;
+			waitingTimer_ = waitTime;
+
+			break;
 		}
 	}
 }

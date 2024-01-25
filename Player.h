@@ -12,7 +12,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Model* model, uint32_t textureHandle);
+	void Initialize(Model* model, uint32_t textureHandle,Vector3 playerPosition);
 	/// <summary>
 	/// 更新
 	/// </summary>
@@ -41,6 +41,13 @@ public:
 	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
 
 	float GetRadius() { return r; }
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="parent"></param>
+	void SetParent(const WorldTransform* parent);
+
+	
 
 private:
 	float r = 1.0f;

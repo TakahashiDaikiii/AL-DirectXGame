@@ -16,6 +16,7 @@
 #include"PlayerBullet.h"
 #include"Skydome.h"
 #include"RailCamera.h"
+#include<sstream>
 
 
 /// <summary>
@@ -55,6 +56,34 @@ public: // メンバ関数
 
 	void CheckALLCollisions();
 
+	/// <summary>
+	/// 敵弾の追加
+	/// </summary>
+	/// <param name="enemybullet"></param>
+	// 新しいメソッド: 敵弾リストの更新
+	void UpdateEnemyBullets();
+
+	// 新しいメソッド: 敵弾リストの描画
+	void DrawEnemyBullets();
+
+	// 新しいメソッド: 敵弾リストの解放
+	void ReleaseEnemyBullets();
+
+	// 敵にゲームシーンのアドレスをセットする
+	void SetGameSceneForEnemy(Enemy* enemy);
+
+	// 新しいメソッド: 敵弾をリストに登録する
+	void AddEnemyBullet(EnemyBullet* enemyBullet);
+
+	// 新しいメソッド: 当たり判定
+	void CheckAllCollisions();
+
+	void LoadEnemyPopData();
+
+	void UpdateEnemyPopCommands();
+
+	void SpawnEnemy(const Vector3& position);
+
 private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -74,6 +103,15 @@ private: // メンバ変数
 
 	Model* modelSkydome_ = nullptr;
 
+	std::list<EnemyBullet*> enemybullets_;
+
+	std::list<Enemy*> enemys_;
+
+	std::stringstream enemyPopCommands;
+
+	bool isWaiting_;
+
+	int waitingTimer_;
 
 
 	Model* model_;
@@ -86,7 +124,7 @@ private: // メンバ変数
 
 	EnemyBullet enemybullet_;
 
-	RailCamera railCamera_;
+	RailCamera* railCamera_;
 
 
 	//デバッグカメラ有効
@@ -94,5 +132,7 @@ private: // メンバ変数
 	bool isDebugCameraActive_ = false;
 
 	DebugCamera* debugCamera_ =nullptr;
+
+
 };
 

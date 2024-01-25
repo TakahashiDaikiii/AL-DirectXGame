@@ -4,6 +4,9 @@
 #include"EnemyBullet.h"
 #include<list>
 
+
+class GameScene;
+
 class Player;
 
 class Enemy {
@@ -27,7 +30,11 @@ public:
 
 	void SetPlayer(Player* player) { player_ = player; }
 
+	void ShootBullet();
+
 	Vector3 GetWorldPosition();
+
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
 
 	//発射間隔
 	static const int kFireInterval = 60;
@@ -68,6 +75,8 @@ private:
 	Player* player_ = nullptr;
 
 	float r = 1.0f;
+
+	GameScene* gameScene_ = nullptr;
 			
 };
 
