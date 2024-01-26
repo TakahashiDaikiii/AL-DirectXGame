@@ -2,11 +2,14 @@
 #include "ImGuiManager.h"
 #include "MyMath.h"
 #include <cassert>
+#include <ViewProjection.h>
 
 Player::~Player() {
 	for (PlayerBullet* bullet : bullets_) {
 		delete bullet;
 	}
+
+	sprite2DReticle_;
 }
 
 Vector3 Player::GetWorldPosition() 
@@ -30,6 +33,8 @@ void Player::SetParent(const WorldTransform* parent)
 
 }
 
+void Player::DrawUI() { sprite2DReticle_->Draw(); }
+
 void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 position) {
 	assert(model);
 
@@ -51,10 +56,18 @@ void Player::Initialize(Model* model, uint32_t textureHandle, Vector3 position) 
 
 	worldTransform_.Initialize();
 
-	
+	worldTransform3DReticle_.Initialize();
+
+	uint32_t textureReticle = TextureManager::Load("Reticle.jpg");
+
+
+	sprite2DReticle_ =
+	    Sprite::Create(textureReticle, {640.0f, 360.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {0.5f, 0.5f});
+
 }
 
-void Player::Update() {
+
+void Player::Update(ViewProjection& viewProjection) {
 	
 	
 	Vector3 move = {0, 0, 0};
@@ -77,25 +90,7 @@ void Player::Update() {
 	worldTransform_.translation_.y -= move.y;
 	worldTransform_.translation_.z += move.z;
 
-	//// スケーリング行列を宣言
-
-	/* Matrix4x4 matScale = {0};
-
-	 matScale.m[0][0] = worldTransform_.scale_.x;
-	 matScale.m[1][1] = worldTransform_.scale_.y;
-	 matScale.m[2][2] = worldTransform_.scale_.z;
-	 matScale.m[3][3] = 1;
-
-	 worldTransform_.TransferMatrix();
-
-	 Matrix4x4 matRotX = {0};
-
-	 matRotX.m[0][0] = 1;
-	 matRotX.m[1][1] = cosf(worldTransform_.rotation_.x);
-	 matRotX.m[2][1] = -sinf(worldTransform_.rotation_.x);
-	 matRotX.m[1][2] = sinf(worldTransform_.rotation_.x);
-	 matRotX.m[2][2] = cosf(worldTransform_.rotation_.x);
-	 matRotX.m[3][3] = 1;*/
+	
 
 	const float kRotSpeed = 0.02f;
 
@@ -107,49 +102,7 @@ void Player::Update() {
 		worldTransform_.rotation_.y += kRotSpeed;
 	}
 
-	////// 行列の転送
-	// worldTransform_.TransferMatrix();
 
-	////// Y
-
-	// Matrix4x4 matRotY = {0};
-	// matRotY.m[0][0] = cosf(worldTransform_.rotation_.y);
-	// matRotY.m[1][1] = 1;
-	// matRotY.m[0][2] = -sinf(worldTransform_.rotation_.y);
-	// matRotY.m[2][0] = sinf(worldTransform_.rotation_.y);
-	// matRotY.m[2][2] = cosf(worldTransform_.rotation_.y);
-	// matRotY.m[3][3] = 1;
-
-	// worldTransform_.TransferMatrix();
-
-	////// Z
-	// Matrix4x4 matRotZ = {0};
-	// matRotZ.m[0][0] = cosf(worldTransform_.rotation_.z);
-	// matRotZ.m[1][0] = sinf(worldTransform_.rotation_.z);
-	// matRotZ.m[0][1] = -sinf(worldTransform_.rotation_.z);
-	// matRotZ.m[1][1] = cosf(worldTransform_.rotation_.z);
-	// matRotZ.m[2][2] = 1;
-	// matRotZ.m[3][3] = 1;
-
-	// Matrix4x4 matRot=Multiply(Multiply( matRotZ,matRotX), matRotY);
-
-	// worldTransform_.TransferMatrix();
-
-	// Matrix4x4 matTrans = {0};
-
-	// matTrans.m[0][0] = 1;
-	// matTrans.m[1][1] = 1;
-	// matTrans.m[2][2] = 1;
-	// matTrans.m[3][3] = 1;
-	// matTrans.m[3][0] = worldTransform_.translation_.x;
-	// matTrans.m[3][1] = worldTransform_.translation_.y;
-	// matTrans.m[3][2] = worldTransform_.translation_.z;
-
-	// worldTransform_.matWorld_ = Multiply(Multiply(matScale, matRot) , matTrans);
-
-	// worldTransform_.TransferMatrix();
-	// worldTransform_.matWorld_ = MakeAffineMatrix(
-	//    worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 
 	worldTransform_.UpdateMatrix();
 	Attack();
@@ -168,10 +121,6 @@ void Player::Update() {
 	}
 
 	// キャラクターの座標を画面表示する処理
-
-
-	
-
 
 	ImGui::Begin("Debug");
 	float playerPos[] = {
@@ -203,7 +152,37 @@ void Player::Update() {
 
 	worldTransform_.translation_.y = min(worldTransform_.translation_.y, +kMoveLimitY);
 
-	
+	const float kDistancePlayerTo3DReticle = 50.0f;
+
+	Vector3 offset = {0, 0, 1.0f};
+
+	offset = Multiply(offset, worldTransform_.matWorld_);
+
+	offset = Multiply(kDistancePlayerTo3DReticle, Normalise(offset));
+
+	// 3Dレティクルの座標を設定
+	worldTransform3DReticle_.translation_ = Add(GetWorldPosition(), offset);
+	worldTransform3DReticle_.UpdateMatrix();
+
+	// 3Dレティクルのワールド座標から2Dレティクルのスクリーン座標を計算
+	Vector3 PositonReticle = Subtract(
+	    {worldTransform3DReticle_.matWorld_.m[3][0], worldTransform3DReticle_.matWorld_.m[3][1],
+	     worldTransform3DReticle_.matWorld_.m[3][2]},
+	    GetWorldPosition());
+
+	// ビューポート行列
+	Matrix4x4 matViewport =
+	    MakeViewPortMatrix(0, 0, WinApp::kWindowWidth, WinApp::kWindowHeight, 0, 1);
+
+	Matrix4x4 matViewProjectionViewport =
+	    Multiply(Multiply(viewProjection.matView, viewProjection.matProjection), matViewport);
+
+	PositonReticle = Transform(PositonReticle, matViewProjectionViewport);
+
+	sprite2DReticle_->SetPosition(Vector2(PositonReticle.x, PositonReticle.y));
+
+
+
 }
 
 
@@ -225,6 +204,12 @@ void Player::Attack() {
 
 		bullets_.push_back(newBullet);
 	}
+
+	const float kBulletSpeed = 1.0f;
+	Vector3 velocity(0, 0, kBulletSpeed);
+
+	//velocity = 
+
 }
 
 void Player::Drow(ViewProjection& viewProjection) {
@@ -233,4 +218,7 @@ void Player::Drow(ViewProjection& viewProjection) {
 	for (PlayerBullet* bullet : bullets_) {
 		bullet->Draw(viewProjection);
 	}
+
+	model_->Draw(worldTransform3DReticle_, viewProjection);
+
 }

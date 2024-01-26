@@ -6,6 +6,7 @@
 #include <PrimitiveDrawer.h>
 #include <cassert>
 #include <list>
+#include <Sprite.h>
 
 class Player {
 public:
@@ -16,7 +17,7 @@ public:
 	/// <summary>
 	/// 更新
 	/// </summary>
-	void Update();
+	void Update(ViewProjection& viewProjection);
 
 	///
 	/// 攻撃
@@ -47,6 +48,8 @@ public:
 	/// <param name="parent"></param>
 	void SetParent(const WorldTransform* parent);
 
+	void DrawUI();
+
 	
 
 private:
@@ -62,4 +65,8 @@ private:
 
 	// 弾
 	std::list<PlayerBullet*> bullets_;
+
+	WorldTransform worldTransform3DReticle_;
+
+	Sprite* sprite2DReticle_ = nullptr;
 };

@@ -20,6 +20,8 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 
+	TextureManager::Load("Reticle.jpg");
+
 	textureHandle_ = TextureManager::Load("Playerr1.png");
 	model_ = Model::Create();
 
@@ -68,18 +70,6 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
-	player_->Update();
-
-	enemy_->Update();
-
-	debugCamera_->Update();
-
-	skydome_->Update();
-
-	railCamera_->Update();
-
-	CheckALLCollisions();
-
 #ifdef _DEBUG
 
 	if (input_->TriggerKey(DIK_0)) {
@@ -95,14 +85,27 @@ void GameScene::Update() {
 		viewProjection_.matProjection = debugCamera_->GetViewProjection().matProjection;
 
 		viewProjection_.TransferMatrix();
-	}else {
+	} else {
 		viewProjection_.matView = railCamera_->GetViewProjection().matView;
 		viewProjection_.matProjection = railCamera_->GetViewProjection().matProjection;
 
 		viewProjection_.TransferMatrix();
 
-		//viewProjection_.UpdateMatrix();
+		// viewProjection_.UpdateMatrix();
 	}
+
+	player_->Update(viewProjection_);
+
+	enemy_->Update();
+
+	debugCamera_->Update();
+
+	skydome_->Update();
+
+	railCamera_->Update();
+
+	CheckALLCollisions();
+
 }
 
 void GameScene::SpawnEnemy(const Vector3& position) {
@@ -157,6 +160,8 @@ void GameScene::Draw() {
 #pragma region 前景スプライト描画
 	// 前景スプライト描画前処理
 	Sprite::PreDraw(commandList);
+
+	player_->DrawUI();
 
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
@@ -311,14 +316,15 @@ void GameScene::LoadEnemyPopData()
 //	}
 // }
 
-void GameScene::UpdateEnemyPopCommands() {
-
+void GameScene::UpdateEnemyPopCommands() { 
+	
 	if (isWaiting_) {
 		waitingTimer_--;
 	}
-	if (waitingTimer_ <= 0) {
-		isWaiting_ = false;
-	}
+		if (waitingTimer_ <= 0) {
+			isWaiting_ = false;
+		}
+
 
 	std::string line;
 
@@ -349,7 +355,8 @@ void GameScene::UpdateEnemyPopCommands() {
 			SpawnEnemy(Vector3(x, y, z));
 		}
 
-		else if (word.find("WITE") == 0) {
+		else if (word.find("WITE") == 0) 
+		{
 			std::getline(line_stream, word, ',');
 
 			int32_t waitTime = atoi(word.c_str());
@@ -358,6 +365,9 @@ void GameScene::UpdateEnemyPopCommands() {
 			waitingTimer_ = waitTime;
 
 			break;
+
 		}
 	}
-}
+	
+
+	}
